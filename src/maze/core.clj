@@ -27,11 +27,11 @@
   (filter identity [(top-neighbour c) (bottom-neighbour c) (right-neighbour c) (left-neighbour c)]))
 
 (defn choose-from-c [c]
-  (first c))
+  (rand-nth (seq c)))
 
 (defn choose-neighbour-from-candidates [cands]
   (when (seq cands)
-    (first cands)))
+    (rand-nth cands)))
 
 (defn find-neighbour-not-in-c [cell c complete]
   (choose-neighbour-from-candidates (remove (into c complete) (neighbours cell))))
