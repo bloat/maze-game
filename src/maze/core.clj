@@ -45,7 +45,9 @@
 (defn remove-from-c [c cell]
   (disj c cell))
 
-(defn maze-gen [grid c complete]
+(defn maze-gen
+  "The growing tree algorithm for maze generation."
+  [grid c complete]
   (if (empty? c)
     grid
     (let [cell-from-c (choose-from-c c)
@@ -53,3 +55,22 @@
       (if neighbour
         (recur (make-path grid cell-from-c neighbour) (add-to-c c neighbour) complete)
         (recur grid (remove-from-c c cell-from-c) (conj complete cell-from-c))))))
+
+(defn h-path? [grid cell]
+  (or (contains? grid [cell (inc cell)])
+      (contains? grid [(inc cell) cell])))
+
+(defn v-path? [grid cell]
+  (or (contains? grid [cell (+ 10 cell)])
+      (contains? grid [(+ 10 cell) cell])))
+
+(defn draw-maze [grid]
+  (println "*-*-*-*-*-*-*-*-*-*-*")
+  (doseq [[cell horizontal] (mapcat (fn [r] (concat (map #(vector % true) r) (map #(vector % false) r))) (partition 10 (range 0 100)))]
+    (if (zero? (rem cell 10))
+      (print (if horizontal "|" "*")))
+    (if horizontal
+      (print (if (h-path? grid cell) "  " " |"))
+      (print (if (v-path? grid cell) " *" "-*")))
+    (if (= 9 (rem cell 10))
+      (println))))
