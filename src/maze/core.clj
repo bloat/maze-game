@@ -64,21 +64,37 @@
 (defn s-fn [c] (+ c 10))
 (def w-fn dec)
 
+(def mv-fns {:n n-fn
+             :e e-fn
+             :s s-fn
+             :w w-fn})
+
 (defn n-path? [grid cell] (path? grid cell n-fn))
 (defn e-path? [grid cell] (path? grid cell e-fn))
 (defn s-path? [grid cell] (path? grid cell s-fn))
 (defn w-path? [grid cell] (path? grid cell w-fn))
 
-(defn draw-maze [grid]
-  (println "*-*-*-*-*-*-*-*-*-*-*")
-  (doseq [[cell horizontal] (mapcat (fn [r] (concat (map #(vector % true) r) (map #(vector % false) r))) (partition 10 (range 0 100)))]
-    (if (zero? (rem cell 10))
-      (print (if horizontal "|" "*")))
-    (if horizontal
-      (print (if (h-path? grid cell) "  " " |"))
-      (print (if (v-path? grid cell) " *" "-*")))
-    (if (= 9 (rem cell 10))
-      (println))))
+(defn path-to-cells [start path]
+  (reduce
+   (fn [cells d] (conj cells ((mv-fns d) (last cells))))
+   [start]
+   path))
+
+(defn draw-maze
+  ([grid] (draw-maze grid []))
+  ([grid path]
+     (let [path-cells (into #{} (path-to-cells 0 path))] 
+       (println "*-*-*-*-*-*-*-*-*-*-*")
+       (doseq [[cell horizontal] (mapcat (fn [r] (concat (map #(vector % true) r) (map #(vector % false) r))) (partition 10 (range 0 100)))]
+         (if (zero? (rem cell 10))
+           (print (if horizontal "|" "*")))
+         (if horizontal
+           (print (if (h-path? grid cell)
+                    (if (contains? path-cells cell) "o " "  ")
+                    (if (contains? path-cells cell) "o|" " |")))
+           (print (if (v-path? grid cell) " *" "-*")))
+         (if (= 9 (rem cell 10))
+           (println))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -93,15 +109,10 @@
 (defn s-view [pos grid] (view pos grid s-path? s-fn))
 (defn w-view [pos grid] (view pos grid w-path? w-fn))
 
-(def mv-fns {'n n-fn
-             'e e-fn
-             's s-fn
-             'w w-fn})
-
-(def path-preds {'n n-path?
-                 'e e-path?
-                 's s-path?
-                 'w w-path?})
+(def path-preds {:n n-path?
+                 :e e-path?
+                 :s s-path?
+                 :w w-path?})
 
 (defn apply-move [cell move grid]
   ;; check for valid move
@@ -112,17 +123,22 @@
 
 (defn play-maze [grid maze-fn start tries path]
   (cond
-    (zero? tries) ['failure path]
-    (= 99 start) ['success path]
+    (zero? tries) [:failure path]
+    (= 99 start) [:success path]
     :else (let [move (maze-fn (n-view start grid)
                               (e-view start grid)
                               (s-view start grid)
                               (w-view start grid)
-                              tries
                               path)]
             (recur grid
                    maze-fn
                    (apply-move start move grid)
                    (dec tries)
                    (append-to-path path move grid)))))
+
+(defn ex-play [n-view e-view s-view w-view path]
+  (first (rand-nth (remove (fn [[_ v]] (zero? v)) [[:n n-view]
+                                                   [:e e-view]
+                                                   [:s s-view]
+                                                   [:w w-view]]))))
 
