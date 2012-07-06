@@ -45,15 +45,17 @@
   (disj c cell))
 
 (defn maze-gen
-  "The growing tree algorithm for maze generation."
-  [grid c complete]
-  (if (empty? c)
-    grid
-    (let [cell-from-c (choose-from-c c)
-          neighbour  (find-neighbour-not-in-c cell-from-c c complete)]
-      (if neighbour
-        (recur (make-path grid cell-from-c neighbour) (add-to-c c neighbour) complete)
-        (recur grid (remove-from-c c cell-from-c) (conj complete cell-from-c))))))
+  ([]
+     (maze-gen #{} #{(rand-int 100)} []))
+  ([grid c complete]
+     "The growing tree algorithm for maze generation."
+     (if (empty? c)
+       grid
+       (let [cell-from-c (choose-from-c c)
+             neighbour  (find-neighbour-not-in-c cell-from-c c complete)]
+         (if neighbour
+           (recur (make-path grid cell-from-c neighbour) (add-to-c c neighbour) complete)
+           (recur grid (remove-from-c c cell-from-c) (conj complete cell-from-c)))))))
 
 (defn path? [grid cell mv-fn]
   (or (contains? grid [cell (mv-fn cell)])
@@ -89,10 +91,10 @@
          (if (zero? (rem cell 10))
            (print (if horizontal "|" "*")))
          (if horizontal
-           (print (if (h-path? grid cell)
+           (print (if (e-path? grid cell)
                     (if (contains? path-cells cell) "o " "  ")
                     (if (contains? path-cells cell) "o|" " |")))
-           (print (if (v-path? grid cell) " *" "-*")))
+           (print (if (s-path? grid cell) " *" "-*")))
          (if (= 9 (rem cell 10))
            (println))))))
 
@@ -141,4 +143,25 @@
                                                    [:e e-view]
                                                    [:s s-view]
                                                    [:w w-view]]))))
+
+(defn op-dir [d]
+  (cond (= d :n) :s
+        (= d :e) :w
+        (= d :s) :n
+        (= d :w) :e))
+
+(defn ex-play2 [n-view e-view s-view w-view path]
+  
+  (let [backwards (op-dir (last path))
+        moves (remove (fn [[_ v]] (zero? v))
+                      [[:n n-view]
+                       [:e e-view]
+                       [:s s-view]
+                       [:w w-view]])
+        not-backwards-moves (if (nil? backwards)
+                              moves
+                              (remove (fn [[d _]] (= d backwards)) moves))]
+    (if (empty? not-backwards-moves)
+      backwards
+      (first (rand-nth not-backwards-moves)))))
 
