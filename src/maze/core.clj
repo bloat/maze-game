@@ -138,11 +138,12 @@
                    (dec tries)
                    (append-to-path path move grid)))))
 
-(defn ex-play [n-view e-view s-view w-view path]
-  (first (rand-nth (remove (fn [[_ v]] (zero? v)) [[:n n-view]
-                                                   [:e e-view]
-                                                   [:s s-view]
-                                                   [:w w-view]]))))
+(def ex-play
+  (fn [n-view e-view s-view w-view path]
+    (first (rand-nth (remove (fn [[_ v]] (zero? v)) [[:n n-view]
+                                                     [:e e-view]
+                                                     [:s s-view]
+                                                     [:w w-view]])))))
 
 (defn op-dir [d]
   (cond (= d :n) :s

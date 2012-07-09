@@ -4,7 +4,8 @@
 (def solvers (atom {}))
 
 (defn process-solver [name code]
-  (swap! solvers assoc name (eval (read-string code)))
+  (swap! solvers assoc name {:fn (eval (read-string code))
+                             :score (ref {:w 0 :l 0 :d 0})})
   ;; read errors, etc.
   ;; allowing more than one function
   (.toString @solvers))
@@ -21,22 +22,27 @@
 (defn pick-player [players]
   (rand-nth (into [] players)))
 
-(defn choose-and-battle [stats]
+(defn inc-win [stat] (update-in stat [:w] inc))
+(defn inc-lose [stat] (update-in stat [:l] inc))
+(defn inc-draw [stat] (update-in stat [:d] inc))
+
+(defn choose-and-battle-and-update-stats! []
   (let [players @solvers]
-    (if (empty? players)
-      stats
-      (let [[n1 p1] (pick-player players)
-            [n2 p2] (pick-player players)]
-        (if (= n1 n2)
-          stats
+    (when (not (empty? players))
+      (let [[n1 {p1 :fn s1 :score}] (pick-player players)
+            [n2 {p2 :fn s2 :score}] (pick-player players)]
+        (when (not (= n1 n2))
           (let [result (battle p1 p2)]
             (cond
               (= 0 result)
-              (update-in (update-in stats [n1 :d] inc) [n2 :d] inc)
+              (dosync
+               (commute s1 inc-draw)
+               (commute s2 inc-draw))
               (= -1 result)
-              (update-in (update-in stats [n1 :w] inc) [n2 :l] inc)
+              (dosync
+               (commute s1 inc-win)
+               (commute s2 inc-lose))
               :else
-              (update-in (update-in stats [n2 :w] inc) [n1 :l] inc))))))))
-
-      
-  
+              (dosync
+               (commute s1 inc-lose)
+               (commute s2 inc-win)))))))))
