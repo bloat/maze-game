@@ -1,5 +1,6 @@
 (ns maze.controller
-  (require [maze.core :as mz]))
+  (use [maze play gen])
+  (import [java.util.concurrent Executors TimeUnit]))
 
 (def solvers (atom {}))
 
@@ -11,10 +12,9 @@
   (.toString @solvers))
 
 (defn battle [s1 s2]
-  (let [maze (mz/maze-gen)
-        _ (mz/draw-maze maze)
-        [_ path1] (mz/play-maze maze s1 0 5000 [])
-        [_ path2] (mz/play-maze maze s2 0 5000 [])]
+  (let [maze (maze-gen)
+        [_ path1] (play-maze maze s1 0 5000 [])
+        [_ path2] (play-maze maze s2 0 5000 [])]
     (cond (= (count path1) (count path2)) 0
           (< (count path1) (count path2)) -1
           :else 1)))
@@ -46,3 +46,6 @@
               (dosync
                (commute s1 inc-lose)
                (commute s2 inc-win)))))))))
+
+;; (def executor (Executors/newScheduledThreadPool 3))
+;; (.scheduleAtFixedRate executor choose-and-battle-and-update-stats! 0 50 TimeUnit/MILLISECONDS)
