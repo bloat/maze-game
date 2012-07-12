@@ -1,15 +1,18 @@
 (ns maze.controller
-  (use [maze play gen])
+  (use [maze play gen util])
   (import [java.util.concurrent Executors TimeUnit]))
 
 (def solvers (atom {}))
 
 (defn process-solver [name code]
-  (swap! solvers assoc name {:fn (eval (read-string code))
-                             :score (ref {:w 0 :l 0 :d 0})})
-  ;; read errors, etc.
-  ;; allowing more than one function
-  (.toString @solvers))
+  (try
+    (let [to-eval (read-string code)]
+      (try
+        (swap! solvers assoc name {:fn (eval to-eval)
+                                   :score (ref {:w 0 :l 0 :d 0})})
+        [:success name to-eval]
+        (catch Exception e [:eval-error name to-eval e])))
+    (catch Exception e [:read-error name code e])))
 
 (defn battle [s1 s2]
   (let [maze (maze-gen)
@@ -47,5 +50,16 @@
                (commute s1 inc-lose)
                (commute s2 inc-win)))))))))
 
-;; (def executor (Executors/newScheduledThreadPool 3))
-;; (.scheduleAtFixedRate executor choose-and-battle-and-update-stats! 0 50 TimeUnit/MILLISECONDS)
+(def no-threads 2)
+(def executor (Executors/newFixedThreadPool no-threads))
+
+(defn- run-battle-and-retrigger []
+  (choose-and-battle-and-update-stats!)
+  (.execute executor run-battle-and-retrigger))
+
+(defn start []
+  (dotimes [count no-threads]
+    (.execute executor run-battle-and-retrigger)))
+
+(defn stop []
+  (.shutdown executor))

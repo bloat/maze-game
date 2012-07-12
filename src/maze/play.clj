@@ -47,18 +47,20 @@
                                                      [:w w-view]])))))
 
 
-(defn ex-play2 [n-view e-view s-view w-view path]
-  
-  (let [backwards (op-dir (last path))
-        moves (remove (fn [[_ v]] (zero? v))
-                      [[:n n-view]
-                       [:e e-view]
-                       [:s s-view]
-                       [:w w-view]])
-        not-backwards-moves (if (nil? backwards)
-                              moves
-                              (remove (fn [[d _]] (= d backwards)) moves))]
-    (if (empty? not-backwards-moves)
-      backwards
-      (first (rand-nth not-backwards-moves)))))
+(def ex-play2
+
+  (fn [n-view e-view s-view w-view path]
+    
+    (let [backwards (op-dir (last path))
+          moves (remove (fn [[_ v]] (zero? v))
+                        [[:n n-view]
+                         [:e e-view]
+                         [:s s-view]
+                         [:w w-view]])
+          not-backwards-moves (if (nil? backwards)
+                                moves
+                                (remove (fn [[d _]] (= d backwards)) moves))]
+      (if (empty? not-backwards-moves)
+        backwards
+        (first (rand-nth not-backwards-moves))))))
 

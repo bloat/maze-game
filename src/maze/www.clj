@@ -4,7 +4,9 @@
             [compojure.handler :as handler]
             [hiccup.page :as html]
             [hiccup.form :as form]
-            [maze.controller :as ctrl]))
+            [maze.controller :as ctrl]
+            [clojure.pprint :as pp])
+  (:import [java.io StringWriter]))
 
 (defn submit-html []
   (html/html5 [:head [:title "Submit your maze solver"]]
@@ -18,9 +20,44 @@
                               (form/text-area "solver")]
                              (form/submit-button "Upload"))]))
 
+(defn results-html []
+  (html/html5 [:head [:title "Maze Challenge"]]
+              [:body
+               [:a {:href "submit"} "Upload a solver"]
+               [:div
+                [:table
+                 [:thead
+                  [:tr
+                   [:th "Name"] [:th "Won"] [:th "Lost"] [:th "Drawn"]]]
+                 [:tbody
+                  (for [[solver {score :score}] @ctrl/solvers]
+                    (let [{w :w l :l d :d} @score]
+                      [:tr [:td solver] [:td w] [:td l] [:td d]]))]]]]))
+
+(defn submit-response [[code name submission exception]]
+  (html/html5 [:head [:title "Maze Challenge"]
+               (cond (= code :success)
+                     [:body
+                      [:p "Successfully uploaded function " name]
+                      [:pre (with-out-str (pp/pprint submission))]
+                      [:a {:href "/"} "Back"]]
+                     (= code :eval-error)
+                     [:body
+                      [:p "Could not evaluate the function " name]
+                      [:p (.getMessage exception)]
+                      [:pre (with-out-str (pp/pprint submission))]
+                      [:a {:href "/"} "Back"]]
+                     (= code :read-error)
+                     [:body
+                      [:p "Could not read the text for the functon " name]
+                      [:p (.getMessage exception)]
+                      [:pre submission]
+                      [:a {:href "/"} "Back"]])]))
+
 (defroutes main-routes
+  (GET "/" _ (results-html))
   (GET "/submit" _ (submit-html))
-  (POST "/upload" {{solver :solver name :name} :params} (ctrl/process-solver name solver))
+  (POST "/upload" {{solver :solver name :name} :params} (submit-response (ctrl/process-solver name solver)))
   (route/resources "/")
   (route/not-found "Page not found"))
 
