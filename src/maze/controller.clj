@@ -8,9 +8,13 @@
   (try
     (let [to-eval (read-string code)]
       (try
-        (swap! solvers assoc name {:fn (eval to-eval)
-                                   :score (ref {:w 0 :l 0 :d 0})})
-        [:success name to-eval]
+        (let [new-solver (eval to-eval)]
+          (try
+            (battle new-solver new-solver)
+            (swap! solvers assoc name {:fn (eval to-eval)
+                                       :score (ref {:w 0 :l 0 :d 0})})
+            [:success name to-eval]
+            (catch Exception e [:test-error name to-eval e])))
         (catch Exception e [:eval-error name to-eval e])))
     (catch Exception e [:read-error name code e])))
 
@@ -36,19 +40,16 @@
             [n2 {p2 :fn s2 :score}] (pick-player players)]
         (when (not (= n1 n2))
           (let [result (battle p1 p2)]
-            (cond
-              (= 0 result)
-              (dosync
-               (commute s1 inc-draw)
-               (commute s2 inc-draw))
-              (= -1 result)
-              (dosync
-               (commute s1 inc-win)
-               (commute s2 inc-lose))
-              :else
-              (dosync
-               (commute s1 inc-lose)
-               (commute s2 inc-win)))))))))
+            (condp = result
+              0 (dosync
+                 (commute s1 inc-draw)
+                 (commute s2 inc-draw))
+              -1 (dosync
+                  (commute s1 inc-win)
+                  (commute s2 inc-lose))
+              1 (dosync
+                 (commute s1 inc-lose)
+                 (commute s2 inc-win)))))))))
 
 (def no-threads 2)
 (def executor (Executors/newFixedThreadPool no-threads))

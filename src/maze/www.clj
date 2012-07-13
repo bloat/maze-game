@@ -35,24 +35,25 @@
                       [:tr [:td solver] [:td w] [:td l] [:td d]]))]]]]))
 
 (defn submit-response [[code name submission exception]]
-  (html/html5 [:head [:title "Maze Challenge"]
+  (html/html5 [:head [:title "Maze Challenge"]]
+              [:body
                (cond (= code :success)
-                     [:body
-                      [:p "Successfully uploaded function " name]
-                      [:pre (with-out-str (pp/pprint submission))]
-                      [:a {:href "/"} "Back"]]
+                     [:span [:p "Successfully uploaded function " name]
+                      [:pre (with-out-str (pp/pprint submission))]]
                      (= code :eval-error)
-                     [:body
-                      [:p "Could not evaluate the function " name]
+                     [:span [:p "Could not evaluate the function " name]
                       [:p (.getMessage exception)]
-                      [:pre (with-out-str (pp/pprint submission))]
-                      [:a {:href "/"} "Back"]]
+                      [:pre (with-out-str (pp/pprint submission))]]
                      (= code :read-error)
-                     [:body
+                     [:span
                       [:p "Could not read the text for the functon " name]
                       [:p (.getMessage exception)]
-                      [:pre submission]
-                      [:a {:href "/"} "Back"]])]))
+                      [:pre submission]]
+                     (= code :test-error)
+                     [:span [:p "Failure when testing function " name]
+                      [:p (.getMessage exception)]
+                      [:pre (with-out-str (pp/pprint submission))]])
+               [:a {:href "/"} "Back"]]))
 
 (defroutes main-routes
   (GET "/" _ (results-html))
