@@ -46,21 +46,17 @@
                                                      [:s s-view]
                                                      [:w w-view]])))))
 
+;; This file is part of Amazing Dojo.
 
-(def ex-play2
+;; Amazing Dojo is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
-  (fn [n-view e-view s-view w-view path]
-    
-    (let [backwards (op-dir (last path))
-          moves (remove (fn [[_ v]] (zero? v))
-                        [[:n n-view]
-                         [:e e-view]
-                         [:s s-view]
-                         [:w w-view]])
-          not-backwards-moves (if (nil? backwards)
-                                moves
-                                (remove (fn [[d _]] (= d backwards)) moves))]
-      (if (empty? not-backwards-moves)
-        backwards
-        (first (rand-nth not-backwards-moves))))))
+;; Amazing Dojo is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+;; GNU General Public License for more details.
 
+;; You should have received a copy of the GNU General Public License
+;; along with Amazing Dojo. If not, see <http://www.gnu.org/licenses/>.

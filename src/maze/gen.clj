@@ -35,3 +35,18 @@ a vector of cells which are completely specified."
          (if neighbour
            (recur (make-path paths cell-from-c neighbour) (conj c neighbour) complete)
            (recur paths (disj c cell-from-c) (conj complete cell-from-c)))))))
+
+;; This file is part of Amazing Dojo.
+
+;; Amazing Dojo is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; Amazing Dojo is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with Amazing Dojo. If not, see <http://www.gnu.org/licenses/>.
