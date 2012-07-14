@@ -1,6 +1,12 @@
 * Amazing Dojo
 This program is a game where players compete to write functions in
 Clojure that can find their way through randomly generated mazes.
+* Instructions
+** The maze solving funtion
+** Running the function
+*** Running manually
+*** Running against a server
+*** Running your own server
 * LICENSE 
 This file is part of Amazing Dojo.
 

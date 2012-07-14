@@ -1,7 +1,8 @@
-* TODO readme file
-* TODO css
+* TODO readme file - write instruction
+* DONE css
 * TODO submission detail page
 * TODO Make the size of the maze a parameter
+* TODO Provide side passage counts to function
 * License
 This file is part of Amazing Dojo.
 

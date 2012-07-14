@@ -1,0 +1,60 @@
+body {
+    background-color: Bisque;
+    font-family: Lucida Sans Unicode, Lucida Grande, sans-serif;
+}
+
+label {
+    float: left;
+    text-align: right;
+    width: 80px;
+    display: block;
+    margin: 8px 4px;
+}
+
+.forminput {
+    margin: 8px 4px; 
+}
+
+#fnarea {
+    width: 400px;    
+    height: 150px;
+}
+
+#fnname {
+    width: 396px;    
+}
+
+#sub {
+    margin: 0 0 0 90px;
+}
+
+#upload {
+    padding: 25px 0;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+td {
+    border: 1px solid black;
+    margin: 0;
+    padding: 4px;
+}
+
+.name {
+    text-align: left;
+}
+
+.score {
+    text-align: right;
+    width: 150px;
+}
+
+#head {
+    padding: 5px 0;
+}
+
+div {
+    margin: 25px 10px;
+}

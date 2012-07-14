@@ -4,6 +4,14 @@
 
 (def solvers (atom {}))
 
+(defn battle [s1 s2]
+  (let [maze (maze-gen)
+        [_ path1] (play-maze maze s1 0 5000 [])
+        [_ path2] (play-maze maze s2 0 5000 [])]
+    (cond (= (count path1) (count path2)) 0
+          (< (count path1) (count path2)) -1
+          :else 1)))
+
 (defn process-solver [name code]
   (try
     (let [to-eval (read-string code)]
@@ -17,14 +25,6 @@
             (catch Exception e [:test-error name to-eval e])))
         (catch Exception e [:eval-error name to-eval e])))
     (catch Exception e [:read-error name code e])))
-
-(defn battle [s1 s2]
-  (let [maze (maze-gen)
-        [_ path1] (play-maze maze s1 0 5000 [])
-        [_ path2] (play-maze maze s2 0 5000 [])]
-    (cond (= (count path1) (count path2)) 0
-          (< (count path1) (count path2)) -1
-          :else 1)))
 
 (defn pick-player [players]
   (rand-nth (into [] players)))

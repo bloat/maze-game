@@ -1,58 +1,64 @@
 (ns maze.www
-  (:use compojure.core)
+  (:use compojure.core hiccup.core)
   (:require [compojure.route :as route]
             [compojure.handler :as handler]
-            [hiccup.page :as html]
-            [hiccup.form :as form]
+            [hiccup
+             [page :as html]
+             [form :as form]]
             [maze.controller :as ctrl]
             [clojure.pprint :as pp])
   (:import [java.io StringWriter]))
 
+(defn head [] 
+  [:head [:title "Maze Challenge"] (html/include-css "style.css")])
+
 (defn submit-html []
-  (html/html5 [:head [:title "Submit your maze solver"]]
+  (html/html5 (head)
               [:body
-               [:p "Submit your maze solver"]
+               [:h1 "Submit your maze solver"]
                [:p "Paste in the text of your maze solver, in the form of an anonymous function literal. The function must take 5 arguments" [:pre "[n-view e-view s-view w-view path]"]]
                (form/form-to [:post "/upload"]
-                             [:p (form/label "name" "name")
-                              (form/text-field "name")]
-                             [:p (form/label "code" "code")
-                              (form/text-area "solver")]
-                             (form/submit-button "Upload"))]))
+                             (form/label "name" "name")
+                             (form/text-field {:id "fnname" :class "forminput"} "name")
+                             [:br]
+                             (form/label "code" "code")
+                             (form/text-area {:id "fnarea" :class "forminput"} "solver")
+                             [:br]
+                             (form/submit-button {:id "sub"} "Upload"))]))
 
 (defn results-html []
-  (html/html5 [:head [:title "Maze Challenge"]]
+  (html/html5 (head)
               [:body
-               [:a {:href "submit"} "Upload a solver"]
+               [:h1 "Amazing Dojo - Current Scores"]
                [:div
                 [:table
                  [:thead
-                  [:tr
-                   [:th "Name"] [:th "Won"] [:th "Lost"] [:th "Drawn"]]]
+                  [:tr#head
+                   [:th.name "Name"] [:th.score "Won"] [:th.score "Lost"] [:th.score "Drawn"]]]
                  [:tbody
                   (for [[solver {score :score}] @ctrl/solvers]
                     (let [{w :w l :l d :d} @score]
-                      [:tr [:td solver] [:td w] [:td l] [:td d]]))]]]]))
+                      [:tr [:td.name solver] [:td.score w] [:td.score l] [:td.score d]]))]]]
+               [:div [:a#upload {:href "submit"} "Upload a solver"]]]))
 
 (defn submit-response [[code name submission exception]]
-  (html/html5 [:head [:title "Maze Challenge"]]
+  (html/html5 (head)
               [:body
                (cond (= code :success)
-                     [:span [:p "Successfully uploaded function " name]
-                      [:pre (with-out-str (pp/pprint submission))]]
+                     (html [:p "Successfully uploaded function " name]
+                           [:pre (with-out-str (pp/pprint submission))])
                      (= code :eval-error)
-                     [:span [:p "Could not evaluate the function " name]
-                      [:p (.getMessage exception)]
-                      [:pre (with-out-str (pp/pprint submission))]]
+                     (html [:p "Could not evaluate the function " name]
+                           [:p (.getMessage exception)]
+                           [:pre (with-out-str (pp/pprint submission))])
                      (= code :read-error)
-                     [:span
-                      [:p "Could not read the text for the functon " name]
-                      [:p (.getMessage exception)]
-                      [:pre submission]]
+                     (html [:p "Could not read the text for the functon " name]
+                           [:p (.getMessage exception)]
+                           [:pre submission])
                      (= code :test-error)
-                     [:span [:p "Failure when testing function " name]
-                      [:p (.getMessage exception)]
-                      [:pre (with-out-str (pp/pprint submission))]])
+                     (html [:p "Failure when testing function " name]
+                           [:p (.getMessage exception)]
+                           [:pre (with-out-str (pp/pprint submission))]))
                [:a {:href "/"} "Back"]]))
 
 (defroutes main-routes
