@@ -1,8 +1,7 @@
-* TODO readme file
-* TODO css
-* TODO submission detail page
-* TODO Make the size of the maze a parameter
-* License
+* Amazing Dojo
+This program is a game where players compete to write functions in
+Clojure that can find their way through randomly generated mazes.
+* LICENSE 
 This file is part of Amazing Dojo.
 
 Amazing Dojo is free software: you can redistribute it and/or modify
@@ -17,6 +16,3 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Amazing Dojo. If not, see <http://www.gnu.org/licenses/>.
-
-
-
