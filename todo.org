@@ -4,7 +4,9 @@
 * TODO Make the size of the maze a parameter
 * TODO Provide side passage counts to function
 * DONE prevent overwriting of functions with the same name.
-* Add percentages to the scores / sort by percentage.
+* DONE Add percentages to the scores / sort by percentage.
+* TODO Add buttons to start and stop
+* TODO Assert that returned move is valid.
 * License
 This file is part of Amazing Dojo.
 

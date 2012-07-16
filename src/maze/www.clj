@@ -26,6 +26,20 @@
                              [:br]
                              (form/submit-button {:id "sub"} "Upload"))]))
 
+(defn score-percentage [{w :w l :l d :d}]
+  (let [total (+ w l d)
+        percentage (if (zero? total)
+                     0.0
+                     (/ w total 0.01))]
+    {:w w :l l :d d :p percentage}))
+
+(defn collate-scores [solvers]
+  (->>
+   (dosync (into [] (map (fn [[name {score :score}]] [name @score]) solvers)))
+   (map #(update-in % [1] score-percentage))
+   (sort (fn [[_ {p1 :p}] [_ {p2 :p}]] (Double/compare p2 p1)))
+   (map #(update-in % [1 :p] (partial format "%.2f")))))
+
 (defn results-html []
   (html/html5 (head)
               [:body
@@ -34,11 +48,10 @@
                 [:table
                  [:thead
                   [:tr#head
-                   [:th.name "Name"] [:th.score "Won"] [:th.score "Lost"] [:th.score "Drawn"]]]
+                   [:th.name "Name"] [:th.score "Won"] [:th.score "Lost"] [:th.score "Drawn"] [:th.score "Percentage"]]]
                  [:tbody
-                  (for [[solver {score :score}] @ctrl/solvers]
-                    (let [{w :w l :l d :d} @score]
-                      [:tr [:td.name solver] [:td.score w] [:td.score l] [:td.score d]]))]]]
+                  (for [[solver {w :w l :l d :d p :p}] (collate-scores @ctrl/solvers)]
+                    [:tr [:td.name solver] [:td.score w] [:td.score l] [:td.score d] [:td.score p]])]]]
                [:div [:a#upload {:href "submit"} "Upload a solver"]]]))
 
 (defn submit-response [[code name submission exception]]
