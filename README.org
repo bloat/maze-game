@@ -3,6 +3,25 @@ This program is a game where players compete to write functions in
 Clojure that can find their way through randomly generated mazes.
 * Instructions
 ** The maze solving funtion
+The maze solving function must take 5 arguments.
+#+BEGIN_SRC clojure
+  (fn [n-view e-view s-view w-view path] 'your-code-here)
+#+END_SRC
+ Each view is a number telling the function the length of the path to
+ the next wall in that direction. For example if the next northerly
+ wall is right next to the current position then n-view wil be 0. If
+ the player has room to move north 3 spaces then n-view will be 3.
+
+ The path argument is a list of all the moves the player has made so far.
+
+ The server expects a single form that evaluates to a function. This
+ means that any helper functions must be defined in a letfn form that
+ returns the main function. For example:
+#+BEGIN_SRC clojure
+  (letfn [(helper-fn [arg] 'helper-code)
+          (another-helper [arg] 'more-code)]
+    (fn [n-view e-view s-view w-view path] 'your-code-which-calls-helpers))
+#+END_SRC
 ** Running the function
 *** Running manually
 *** Running against a server
