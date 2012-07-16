@@ -14,9 +14,9 @@ The maze solving function must take 5 arguments.
 
  The path argument is a list of all the moves the player has made so far.
 
- The server expects a single form that evaluates to a function. This
- means that any helper functions must be defined in a letfn form that
- returns the main function. For example:
+ The web server expects a single form that evaluates to a
+ function. This means that any helper functions must be defined in a
+ letfn form that returns the main function. For example:
 #+BEGIN_SRC clojure
   (letfn [(helper-fn [arg] 'helper-code)
           (another-helper [arg] 'more-code)]
@@ -24,8 +24,50 @@ The maze solving function must take 5 arguments.
 #+END_SRC
 ** Running the function
 *** Running manually
+You can generate a maze using the maze-gen function.
+#+BEGIN_SRC clojure
+  (use 'maze.gen)
+  (maze.gen/maze-gen)
+#+END_SRC
+
+You can print the maze using the draw-maze function.
+#+BEGIN_SRC clojure
+  (use 'maze.gen)
+  (use 'maze.draw)
+  (draw-maze (maze-gen))
+#+END_SRC
+
+You can run your maze solving function using the play-maze
+function. The first argument is the maze. The second is your
+function. The third is the start point, use 0 here, which is the most
+north-westerly location. The last argument is your path so far, so
+start with an empty vector.
+#+BEGIN_SRC clojure
+  (use 'maze.gen)
+  (use 'maze.play)
+  (play-maze (maze-gen) your-fn 0 1000 [])
+#+END_SRC
 *** Running against a server
+To upload a function to a running server just follow the instructions
+on the server's index page. Remember to use a single form.
 *** Running your own server
+To run the server first clone the project.
+#+BEGIN_EXAMPLE
+$ git clone https://github.com/bloat/maze-game.git
+#+END_EXAMPLE
+Then start a repl - you can use swank if you prefer at this point.
+#+BEGIN_EXAMPLE
+$ cd maze-game
+$ lein deps
+$ lein repl
+#+END_EXAMPLE
+To start the web server use the following code in the repl.
+#+BEGIN_SRC clojure
+  (load-file "src/maze/www.clj")
+  (in-ns 'maze.www)
+  (use 'ring.adapter.jetty)
+  (.start (Thread. #(run-jetty app {:port 3003})))
+#+END_SRC
 * LICENSE 
 This file is part of Amazing Dojo.
 
