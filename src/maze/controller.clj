@@ -12,6 +12,14 @@
           (< (count path1) (count path2)) -1
           :else 1)))
 
+(defn get-solver-fn [solvers-val name]
+  (:fn (solvers-val name)))
+
+(defn assoc-new-solver [solvers name new-solver]
+  (if (contains? solvers name)
+    solvers
+    (assoc solvers name {:fn new-solver :score (ref {:w 0 :l 0 :d 0})})))
+
 (defn process-solver [name code]
   (try
     (let [to-eval (read-string code)]
@@ -19,9 +27,13 @@
         (let [new-solver (eval to-eval)]
           (try
             (battle new-solver new-solver)
-            (swap! solvers assoc name {:fn (eval to-eval)
-                                       :score (ref {:w 0 :l 0 :d 0})})
-            [:success name to-eval]
+            (let [new-named-solver
+                  (get-solver-fn
+                   (swap! solvers assoc-new-solver name new-solver)
+                   name)]
+              (if (identical? new-named-solver new-solver)
+                [:success name to-eval]
+                [:name-clash name to-eval]))
             (catch Exception e [:test-error name to-eval e])))
         (catch Exception e [:eval-error name to-eval e])))
     (catch Exception e [:read-error name code e])))

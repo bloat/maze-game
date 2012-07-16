@@ -40,11 +40,13 @@
                    (append-to-path path move grid)))))
 
 (def ex-play
-  (fn [n-view e-view s-view w-view path]
-    (first (rand-nth (remove (fn [[_ v]] (zero? v)) [[:n n-view]
-                                                     [:e e-view]
-                                                     [:s s-view]
-                                                     [:w w-view]])))))
+  (let [df
+        (fn [n-view e-view s-view w-view path]
+          (first (rand-nth (remove (fn [[_ v]] (zero? v)) [[:n n-view]
+                                                           [:e e-view]
+                                                           [:s s-view]
+                                                           [:w w-view]]))))]
+    df))
 
 ;; This file is part of Amazing Dojo.
 

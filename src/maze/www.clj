@@ -44,21 +44,20 @@
 (defn submit-response [[code name submission exception]]
   (html/html5 (head)
               [:body
-               (cond (= code :success)
-                     (html [:p "Successfully uploaded function " name]
-                           [:pre (with-out-str (pp/pprint submission))])
-                     (= code :eval-error)
-                     (html [:p "Could not evaluate the function " name]
-                           [:p (.getMessage exception)]
-                           [:pre (with-out-str (pp/pprint submission))])
-                     (= code :read-error)
-                     (html [:p "Could not read the text for the functon " name]
-                           [:p (.getMessage exception)]
-                           [:pre submission])
-                     (= code :test-error)
-                     (html [:p "Failure when testing function " name]
-                           [:p (.getMessage exception)]
-                           [:pre (with-out-str (pp/pprint submission))]))
+               (condp = code
+                 :success (html [:p "Successfully uploaded function " name]
+                                [:pre (with-out-str (pp/pprint submission))])
+                 :eval-error (html [:p "Could not evaluate the function " name]
+                                   [:p (.getMessage exception)]
+                                   [:pre (with-out-str (pp/pprint submission))])
+                 :read-error (html [:p "Could not read the text for the functon " name]
+                                   [:p (.getMessage exception)]
+                                   [:pre submission])
+                 :test-error (html [:p "Failure when testing function " name]
+                                   [:p (.getMessage exception)]
+                                   [:pre (with-out-str (pp/pprint submission))])
+                 :name-clash (html [:p "The name " name " is already taken."]
+                                   [:pre (with-out-str (pp/pprint submission))]))
                [:a {:href "/"} "Back"]]))
 
 (defroutes main-routes
