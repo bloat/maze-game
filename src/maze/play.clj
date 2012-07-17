@@ -1,25 +1,26 @@
 (ns maze.play
   (use [maze.util]))
 
-(defn view [pos grid path-pred mv-fn]
-  (loop [length 0 cell pos]
-    (if (path-pred grid cell)
-      (recur (inc length) (mv-fn cell))
-      length)))
-
-(defn n-view [pos grid] (view pos grid n-path? (mv-fns :n)))
-(defn e-view [pos grid] (view pos grid e-path? (mv-fns :e)))
-(defn s-view [pos grid] (view pos grid s-path? (mv-fns :s)))
-(defn w-view [pos grid] (view pos grid w-path? (mv-fns :w)))
-
 (def path-preds {:n n-path?
                  :e e-path?
                  :s s-path?
                  :w w-path?})
 
+(defn view [pos grid dir]
+  (loop [length 0 cell pos]
+    (if ((path-preds dir) grid cell)
+      (recur (inc length) ((mv-fns dir) cell))
+      length)))
+
+(defn n-view [pos grid] (view pos grid :n))
+(defn e-view [pos grid] (view pos grid :e))
+(defn s-view [pos grid] (view pos grid :s))
+(defn w-view [pos grid] (view pos grid :w))
+
 (defn apply-move [cell move grid]
-  ;; check for valid move
-  ((mv-fns move) cell))
+  (if ((path-preds move) grid cell)
+    ((mv-fns move) cell)
+    cell))
 
 (defn append-to-path [path move grid]
   (conj path move))

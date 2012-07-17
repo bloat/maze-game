@@ -7,21 +7,30 @@ The maze solving function must take 5 arguments.
 #+BEGIN_SRC clojure
   (fn [n-view e-view s-view w-view path] 'your-code-here)
 #+END_SRC
- Each view is a number telling the function the length of the path to
- the next wall in that direction. For example if the next northerly
- wall is right next to the current position then n-view wil be 0. If
- the player has room to move north 3 spaces then n-view will be 3.
+Each view is a number telling the function the length of the path to
+the next wall in that direction. For example if the next northerly
+wall is right next to the current position then n-view wil be 0. If
+the player has room to move north 3 spaces then n-view will be 3.
 
- The path argument is a list of all the moves the player has made so far.
+The path argument is a list of all the moves the player has made so far.
 
- The web server expects a single form that evaluates to a
- function. This means that any helper functions must be defined in a
- letfn form that returns the main function. For example:
+The function does not get told its absolute position within the maze,
+but know that you begin at position 0 (north-west) and succeed when
+you reach position 99 (south-east).
+
+The web server expects a single form that evaluates to a
+function. This means that any helper functions must be defined in a
+letfn form that returns the main function. For example:
 #+BEGIN_SRC clojure
   (letfn [(helper-fn [arg] 'helper-code)
           (another-helper [arg] 'more-code)]
     (fn [n-view e-view s-view w-view path] 'your-code-which-calls-helpers))
 #+END_SRC
+
+Each turn, the function must return a keyword, one of :n, :e, :s or :w.
+
+If your move is invalid the function will be called again with the
+same inputs, except one try will have been used.
 ** Running the function
 *** Running against a server
 To upload a function to a running server just follow the instructions
@@ -36,11 +45,10 @@ Then start a repl - you can use swank if you prefer at this point.
 $ cd maze-game
 $ lein deps
 $ lein repl
+user=> (require 'maze.www)
 #+END_EXAMPLE
 You can generate a maze using the maze-gen function.
 #+BEGIN_SRC clojure
-  (load-file "src/maze/www.clj")
-  (use 'maze.gen)
   (maze.gen/maze-gen)
 #+END_SRC
 
@@ -64,7 +72,7 @@ start with an empty vector.
 *** Running your own server
 To start the web server start a repl as above. Use the following code in the repl.
 #+BEGIN_SRC clojure
-  (load-file "src/maze/www.clj")
+  (require 'maze.www)
   (in-ns 'maze.www)
   (use 'ring.adapter.jetty)
   (.start (Thread. #(run-jetty app {:port 3003})))
