@@ -62,7 +62,7 @@ You can print the maze using the draw-maze function.
 You can run your maze solving function using the play-maze
 function. The first argument is the maze. The second is your
 function. The third is the start point, use 0 here, which is the most
-north-westerly location. The forth argument is the number of turns
+north-westerly location. The fourth argument is the number of turns
 your function will get before giving up. The game server allows 5000
 turns. The last argument is your path so far, so start with an empty
 vector.
@@ -79,6 +79,9 @@ To start the web server start a repl as above. Use the following code in the rep
   (use 'ring.adapter.jetty)
   (.start (Thread. #(run-jetty app {:port 3003})))
 #+END_SRC
+*** Security
+There is no protection against malicious usage. Any function that is
+uploaded will be executed! Run the server on a throw away VM.
 * LICENSE 
 This file is part of Amazing Dojo.
 
