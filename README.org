@@ -62,8 +62,10 @@ You can print the maze using the draw-maze function.
 You can run your maze solving function using the play-maze
 function. The first argument is the maze. The second is your
 function. The third is the start point, use 0 here, which is the most
-north-westerly location. The last argument is your path so far, so
-start with an empty vector.
+north-westerly location. The forth argument is the number of turns
+your function will get before giving up. The game server allows 5000
+turns. The last argument is your path so far, so start with an empty
+vector.
 #+BEGIN_SRC clojure
   (use 'maze.gen)
   (use 'maze.play)

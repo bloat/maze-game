@@ -1,4 +1,4 @@
-* TODO readme file - write instruction
+* DONE readme file - write instruction
 * DONE css
 * TODO submission detail page
 * TODO Make the size of the maze a parameter
@@ -6,7 +6,7 @@
 * DONE prevent overwriting of functions with the same name.
 * DONE Add percentages to the scores / sort by percentage.
 * TODO Add buttons to start and stop
-* TODO Assert that returned move is valid.
+* DONE Assert that returned move is valid.
 * License
 This file is part of Amazing Dojo.
 

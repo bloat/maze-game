@@ -22,9 +22,6 @@
     ((mv-fns move) cell)
     cell))
 
-(defn append-to-path [path move grid]
-  (conj path move))
-
 (defn play-maze [grid maze-fn start tries path]
   (cond
     (zero? tries) [:failure path]
@@ -33,12 +30,14 @@
                               (e-view start grid)
                               (s-view start grid)
                               (w-view start grid)
-                              path)]
+                              path)
+                new-cell (apply-move start move grid)
+                new-path (if (= start new-cell) path (conj path move))]
             (recur grid
                    maze-fn
-                   (apply-move start move grid)
+                   new-cell
                    (dec tries)
-                   (append-to-path path move grid)))))
+                   new-path))))
 
 (def ex-play
   (let [df
