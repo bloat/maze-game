@@ -6,11 +6,21 @@
                  :s s-path?
                  :w w-path?})
 
+(defn inc-if-can-go [cell grid dir to-inc]
+  (if ((path-preds dir) grid cell)
+    (inc to-inc)
+    to-inc))
+
 (defn view [pos grid dir]
-  (loop [length 0 cell pos]
-    (if ((path-preds dir) grid cell)
-      (recur (inc length) ((mv-fns dir) cell))
-      length)))
+  (loop [length 0 r-paths 0 l-paths 0 cell pos]
+    (let [new-r-paths (inc-if-can-go cell grid (right-dir dir) r-paths)
+          new-l-paths (inc-if-can-go cell grid (left-dir dir) l-paths)]
+      (if ((path-preds dir) grid cell)
+        (recur (inc length)
+               new-r-paths
+               new-l-paths
+               ((mv-fns dir) cell))
+        [length new-r-paths new-l-paths]))))
 
 (defn n-view [pos grid] (view pos grid :n))
 (defn e-view [pos grid] (view pos grid :e))

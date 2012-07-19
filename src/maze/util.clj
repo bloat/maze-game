@@ -63,6 +63,22 @@ in the direction given by the function mv-fn."
         (= d :s) :n
         (= d :w) :e))
 
+(defn left-dir
+  "Returns the direction 90 degrees left of the one given."
+  [d]
+  (cond (= d :n) :w
+        (= d :e) :n
+        (= d :s) :e
+        (= d :w) :s))
+
+(defn right-dir
+  "Returns the direction 90 degrees right of the one given."
+  [d]
+  (cond (= d :n) :e
+        (= d :e) :s
+        (= d :s) :w
+        (= d :w) :n))
+
 ;; This file is part of Amazing Dojo.
 
 ;; Amazing Dojo is free software: you can redistribute it and/or modify

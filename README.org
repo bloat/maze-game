@@ -7,10 +7,25 @@ The maze solving function must take 5 arguments.
 #+BEGIN_SRC clojure
   (fn [n-view e-view s-view w-view path] 'your-code-here)
 #+END_SRC
-Each view is a number telling the function the length of the path to
-the next wall in that direction. For example if the next northerly
-wall is right next to the current position then n-view wil be 0. If
-the player has room to move north 3 spaces then n-view will be 3.
+Each view is a vector containing 3 numbers. The first number tells the
+function the length of the path to the next wall in that
+direction. For example if the next northerly wall is right next to the
+current position then n-view's first number will be 0. If the player
+has room to move north 3 spaces then n-view's first number will
+be 3. The second and third values in each vector are the number of
+side passages along the path, leading to the right and to the left
+respectively.
+
+Picture the scene - you are in a maze facing south - about 10 metres
+directly ahead of you there is a wall. There is a wall immediately to
+your left (east) and another passage to your right (west). Up ahead,
+before the wall you can also make out another passage off to the
+left. In this situation the s-view argument to the function would be
+[5 1 1]. The 5 is the distance to the next wall (assuming 2 metres for
+each space). The first 1 is the passage immediately to your right. The
+second 1 is the passage up ahead leading left. Note that you are not
+told how far away any side passages are, only how many of them there
+are.
 
 The path argument is a list of all the moves the player has made so far.
 
