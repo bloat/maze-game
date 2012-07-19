@@ -83,6 +83,15 @@
                                    [:pre (with-out-str (pp/pprint submission))]))
                [:a {:href "/"} "Back"]]))
 
+(defn control-page []
+  (html/html5 (head)
+              [:body
+               [:a {:href "/"} "Back to the game"]
+               [:p "The game is currently " (if (ctrl/is-running?) "running." "not running.")]
+               (if (ctrl/is-running?)
+                 [:a {:href "/control/stop"} "Pause the game"]
+                 [:a {:href "/control/start"} "Start the game"])]))
+
 (defroutes main-routes
   (GET "/" _ (results-html))
   (GET "/submit" _ (submit-html))
@@ -90,6 +99,10 @@
     (ctrl/delete-solver solver)
     (rr/redirect "/"))
   (POST "/upload" [solver name] (submit-response (ctrl/process-solver name solver)))
+  (GET "/control" _ (control-page))
+  (GET "/control/:action" [action]
+    (ctrl/start-stop (keyword action))
+    (rr/redirect "/control"))
   (route/resources "/")
   (route/not-found "Page not found"))
 

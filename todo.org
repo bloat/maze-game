@@ -5,7 +5,7 @@
 * TODO Provide side passage counts to function
 * DONE prevent overwriting of functions with the same name.
 * DONE Add percentages to the scores / sort by percentage.
-* TODO Add buttons to start and stop
+* DONE Add buttons to start and stop
 * DONE Assert that returned move is valid.
 * DONE Add button to delete a solver.
 * License

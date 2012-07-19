@@ -66,19 +66,29 @@
                  (commute s1 inc-lose)
                  (commute s2 inc-win)))))))))
 
+(def run-control (atom false))
+
 (def no-threads 2)
 (def executor (Executors/newFixedThreadPool no-threads))
 
 (defn- run-battle-and-retrigger []
-  (choose-and-battle-and-update-stats!)
-  (.execute executor run-battle-and-retrigger))
+  (when @run-control
+    (choose-and-battle-and-update-stats!)
+    (.execute executor run-battle-and-retrigger)))
 
 (defn start []
+  (reset! run-control true)
   (dotimes [count no-threads]
     (.execute executor run-battle-and-retrigger)))
 
-(defn stop []
-  (.shutdown executor))
+(defn stop [] (reset! run-control false))
+
+(defn start-stop [action]
+  (if (= :start action)
+    (start)
+    (stop)))
+
+(defn is-running? [] @run-control)
 
 ;; This file is part of Amazing Dojo.
 

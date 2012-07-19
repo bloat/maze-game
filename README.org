@@ -72,12 +72,26 @@ vector.
   (play-maze (maze-gen) your-fn 0 1000 [])
 #+END_SRC
 *** Running your own server
-To start the web server start a repl as above. Use the following code in the repl.
+To start the web server start a repl as above. Use the following code
+in the repl.
 #+BEGIN_SRC clojure
   (require 'maze.www)
   (in-ns 'maze.www)
   (use 'ring.adapter.jetty)
   (.start (Thread. #(run-jetty app {:port 3003})))
+#+END_SRC
+
+This will start the server and allow competitors to upload their
+entries, but the server will not actually run any matches until the
+game is started. To do this you can visit
+#+BEGIN_EXAMPLE
+http://<yourhost>/control
+#+END_EXAMPLE
+You can also start at stop the game from the repl.
+#+BEGIN_SRC clojure
+  (in-ns 'maze.controller)
+  (start)
+  (stop)
 #+END_SRC
 *** Security
 There is no protection against malicious usage. Any function that is
