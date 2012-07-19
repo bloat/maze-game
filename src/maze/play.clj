@@ -40,13 +40,11 @@
                    new-path))))
 
 (def ex-play
-  (let [df
-        (fn [n-view e-view s-view w-view path]
-          (first (rand-nth (remove (fn [[_ v]] (zero? v)) [[:n n-view]
-                                                           [:e e-view]
-                                                           [:s s-view]
-                                                           [:w w-view]]))))]
-    df))
+  (fn [n-view e-view s-view w-view path]
+    (first (rand-nth (remove (fn [[_ v]] (zero? v)) [[:n n-view]
+                                                     [:e e-view]
+                                                     [:s s-view]
+                                                     [:w w-view]])))))
 
 ;; This file is part of Amazing Dojo.
 

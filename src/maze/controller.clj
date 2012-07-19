@@ -38,6 +38,9 @@
         (catch Exception e [:eval-error name to-eval e])))
     (catch Exception e [:read-error name code e])))
 
+(defn delete-solver [name]
+  (swap! solvers dissoc name))
+
 (defn pick-player [players]
   (rand-nth (into [] players)))
 

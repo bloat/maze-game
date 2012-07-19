@@ -7,6 +7,7 @@
 * DONE Add percentages to the scores / sort by percentage.
 * TODO Add buttons to start and stop
 * DONE Assert that returned move is valid.
+* DONE Add button to delete a solver.
 * License
 This file is part of Amazing Dojo.
 

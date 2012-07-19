@@ -6,7 +6,10 @@
              [page :as html]
              [form :as form]]
             [maze.controller :as ctrl]
-            [clojure.pprint :as pp])
+            [clojure.pprint :as pp]
+            [ring.util
+             [response :as rr]
+             [codec :as rc]])
   (:import [java.io StringWriter]))
 
 (defn head [] 
@@ -48,10 +51,17 @@
                 [:table
                  [:thead
                   [:tr#head
-                   [:th.name "Name"] [:th.score "Won"] [:th.score "Lost"] [:th.score "Drawn"] [:th.score "Percentage"]]]
+                   [:th] [:th.name "Name"] [:th.score "Won"] [:th.score "Lost"] [:th.score "Drawn"] [:th.score "Percentage"]]]
                  [:tbody
                   (for [[solver {w :w l :l d :d p :p}] (collate-scores @ctrl/solvers)]
-                    [:tr [:td.name solver] [:td.score w] [:td.score l] [:td.score d] [:td.score p]])]]]
+                    [:tr
+                     [:td.delete [:img {:src "del.png"
+                                        :onclick (str "javascript: if (confirm('Remove solver: " solver " ?')) window.location='/delete/" (rc/url-encode solver) "';")}]]
+                     [:td.name solver]
+                     [:td.score w]
+                     [:td.score l]
+                     [:td.score d]
+                     [:td.score p]])]]]
                [:div [:a#upload {:href "submit"} "Upload a solver"]]]))
 
 (defn submit-response [[code name submission exception]]
@@ -76,7 +86,10 @@
 (defroutes main-routes
   (GET "/" _ (results-html))
   (GET "/submit" _ (submit-html))
-  (POST "/upload" {{solver :solver name :name} :params} (submit-response (ctrl/process-solver name solver)))
+  (GET "/delete/:solver" [solver]
+    (ctrl/delete-solver solver)
+    (rr/redirect "/"))
+  (POST "/upload" [solver name] (submit-response (ctrl/process-solver name solver)))
   (route/resources "/")
   (route/not-found "Page not found"))
 
