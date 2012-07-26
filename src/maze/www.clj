@@ -4,13 +4,14 @@
             [compojure.handler :as handler]
             [hiccup
              [page :as html]
-             [form :as form]]
+             [form :as form]
+             [util :as util]]
             [maze.controller :as ctrl]
             [clojure.pprint :as pp]
             [ring.util
              [response :as rr]
-             [codec :as rc]])
-  (:import [java.io StringWriter]))
+             [codec :as rc]]
+            [ring.middleware.multipart-params :as mp]))
 
 (defn head [] 
   [:head [:title "Maze Challenge"] (html/include-css "style.css")])
@@ -27,7 +28,15 @@
                              (form/label "code" "code")
                              (form/text-area {:id "fnarea" :class "forminput"} "solver")
                              [:br]
-                             (form/submit-button {:id "sub"} "Upload"))]))
+                             (form/submit-button {:id "sub"} "Upload"))
+               [:form {:action "/file-upload" :method "post" :enctype "multipart/form-data"}
+                (form/label "namespace" "namespace")
+                (form/text-field {:id "namespace" :class "forminput"} "namespace")
+                [:br]
+                (form/label "file name" "file name")
+                (form/file-upload {:class "forminput"} "file")
+                [:br]
+                (form/submit-button {:id "sub"} "Upload")]]))
 
 (defn score-percentage [{w :w l :l d :d}]
   (let [total (+ w l d)
@@ -64,23 +73,19 @@
                      [:td.score p]])]]]
                [:div [:a#upload {:href "submit"} "Upload a solver"]]]))
 
-(defn submit-response [[code name submission exception]]
+(defn format-msg [message]
+  [:pre (util/escape-html (with-out-str (pp/pprint message)))])
+
+(defn submit-response [[code name message exception]]
   (html/html5 (head)
               [:body
                (condp = code
                  :success (html [:p "Successfully uploaded function " name]
-                                [:pre (with-out-str (pp/pprint submission))])
-                 :eval-error (html [:p "Could not evaluate the function " name]
-                                   [:p (.getMessage exception)]
-                                   [:pre (with-out-str (pp/pprint submission))])
-                 :read-error (html [:p "Could not read the text for the functon " name]
-                                   [:p (.getMessage exception)]
-                                   [:pre submission])
-                 :test-error (html [:p "Failure when testing function " name]
-                                   [:p (.getMessage exception)]
-                                   [:pre (with-out-str (pp/pprint submission))])
-                 :name-clash (html [:p "The name " name " is already taken."]
-                                   [:pre (with-out-str (pp/pprint submission))]))
+                                (format-msg message))
+                 :error (html [:p "Problem loading " name]
+                              (when exception
+                                [:p (.getMessage exception)])
+                              (format-msg message)))
                [:a {:href "/"} "Back"]]))
 
 (defn control-page []
@@ -99,6 +104,8 @@
     (ctrl/delete-solver solver)
     (rr/redirect "/"))
   (POST "/upload" [solver name] (submit-response (ctrl/process-solver name solver)))
+  (mp/wrap-multipart-params
+   (POST "/file-upload" [namespace file] (submit-response (ctrl/upload-solver namespace file))))
   (GET "/control" _ (control-page))
   (GET "/control/:action" [action]
     (ctrl/start-stop (keyword action))

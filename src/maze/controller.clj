@@ -20,23 +20,49 @@
     solvers
     (assoc solvers name {:fn new-solver :score (ref {:w 0 :l 0 :d 0})})))
 
+(defn error-vector
+  ([name message] [:error name message nil])
+  ([name message e] [:error name message e]))
+
+(defn dump-failed-ns
+  ([name message] (dump-failed-ns name message nil))
+  ([name message e]
+     (remove-ns (symbol name))
+     (error-vector name message e)))
+
+(defn test-solver-and-stash [name new-solver data error-fn]
+  (try
+    (battle new-solver new-solver)
+    (let [new-named-solver
+          (get-solver-fn
+           (swap! solvers assoc-new-solver name new-solver)
+           name)]
+      (if (identical? new-named-solver new-solver)
+        [:success name data]
+        (error-fn name ["That name is already taken." data])))
+    (catch Exception e (error-fn name ["Problem when running your function." data] e))))
+
 (defn process-solver [name code]
   (try
     (let [to-eval (read-string code)]
       (try
-        (let [new-solver (eval to-eval)]
-          (try
-            (battle new-solver new-solver)
-            (let [new-named-solver
-                  (get-solver-fn
-                   (swap! solvers assoc-new-solver name new-solver)
-                   name)]
-              (if (identical? new-named-solver new-solver)
-                [:success name to-eval]
-                [:name-clash name to-eval]))
-            (catch Exception e [:test-error name to-eval e])))
-        (catch Exception e [:eval-error name to-eval e])))
-    (catch Exception e [:read-error name code e])))
+        (test-solver-and-stash name (eval to-eval) to-eval error-vector)
+        (catch Exception e (error-vector name ["Problem when evaluating your function." to-eval] e))))
+    (catch Exception e (error-vector name ["Problem when reading your input." code] e))))
+
+(defn upload-solver [name {file :tempfile}]
+  (if (find-ns (symbol name))
+    [:error name "That name is already taken"]
+    (try
+      (load-file (.getAbsolutePath file))
+      (let [new-ns (find-ns (symbol name))]
+        (if new-ns
+          (let [solver-fn (ns-resolve new-ns 'solver)]
+            (if solver-fn
+              (test-solver-and-stash name solver-fn solver-fn dump-failed-ns)
+              (dump-failed-ns name "No function found called solver")))
+          (error-vector name ["No namespace found called " name])))
+      (catch Exception e (dump-failed-ns name file e)))))
 
 (defn delete-solver [name]
   (swap! solvers dissoc name))

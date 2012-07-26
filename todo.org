@@ -8,6 +8,8 @@
 * DONE Add buttons to start and stop
 * DONE Assert that returned move is valid.
 * DONE Add button to delete a solver.
+* DONE Allow users to upload multiple forms in a namespace.
+* TODO Store data to a file in case server crashes.
 * License
 This file is part of Amazing Dojo.
 
