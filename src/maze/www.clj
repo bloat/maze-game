@@ -20,15 +20,9 @@
   (html/html5 (head)
               [:body
                [:h1 "Submit your maze solver"]
-               [:p "Paste in the text of your maze solver, in the form of an anonymous function literal. The function must take 5 arguments" [:pre "[n-view e-view s-view w-view path]"]]
-               (form/form-to [:post "/upload"]
-                             (form/label "name" "name")
-                             (form/text-field {:id "fnname" :class "forminput"} "name")
-                             [:br]
-                             (form/label "code" "code")
-                             (form/text-area {:id "fnarea" :class "forminput"} "solver")
-                             [:br]
-                             (form/submit-button {:id "sub"} "Upload"))
+               [:h3 "Upload a file"]
+               [:p "Enter the namespace declared in the file, and the filename. Your namespace must contain function called solver which takes 5 arguments."
+                [:pre "(defn solver [n-view e-view s-view w-view path] ... )"]]
                [:form {:action "/file-upload" :method "post" :enctype "multipart/form-data"}
                 (form/label "namespace" "namespace")
                 (form/text-field {:id "namespace" :class "forminput"} "namespace")
@@ -36,7 +30,18 @@
                 (form/label "file name" "file name")
                 (form/file-upload {:class "forminput"} "file")
                 [:br]
-                (form/submit-button {:id "sub"} "Upload")]]))
+                (form/submit-button {:id "sub"} "Upload")]
+               [:br] [:br]
+               [:h3 "Upload a single form"]
+               [:p "Paste in the text of your maze solver, in the form of an anonymous function literal. The function must take 5 arguments." [:pre "(fn [n-view e-view s-view w-view path] ... )"]]
+               (form/form-to [:post "/upload"]
+                             (form/label "name" "name")
+                             (form/text-field {:id "fnname" :class "forminput"} "name")
+                             [:br]
+                             (form/label "code" "code")
+                             (form/text-area {:id "fnarea" :class "forminput"} "solver")
+                             [:br]
+                             (form/submit-button {:id "sub"} "Upload"))]))
 
 (defn score-percentage [{w :w l :l d :d}]
   (let [total (+ w l d)

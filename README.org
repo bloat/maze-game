@@ -33,23 +33,34 @@ The function does not get told its absolute position within the maze,
 but know that you begin at position 0 (north-west) and succeed when
 you reach position 99 (south-east).
 
-The web server expects a single form that evaluates to a
-function. This means that any helper functions must be defined in a
-letfn form that returns the main function. For example:
-#+BEGIN_SRC clojure
-  (letfn [(helper-fn [arg] 'helper-code)
-          (another-helper [arg] 'more-code)]
-    (fn [n-view e-view s-view w-view path] 'your-code-which-calls-helpers))
-#+END_SRC
-
 Each turn, the function must return a keyword, one of :n, :e, :s or :w.
 
 If your move is invalid the function will be called again with the
 same inputs, except one try will have been used.
+
 ** Running the function
 *** Running against a server
-To upload a function to a running server just follow the instructions
-on the server's index page. Remember to use a single form.
+To upload a function to a running server just follow the upload link
+on the server's index page. You can upload a whole file with a
+namespace, or just paste in a single form.
+
+When pasting code directly, the server expects a single form that
+evaluates to a function. This means that any helper functions must be
+defined in a letfn form that returns the main function. For example:
+#+BEGIN_SRC clojure
+  (letfn [(helper-fn [arg] 'helper-code) (another-helper [arg]
+          'more-code)] (fn [n-view e-view s-view w-view path]
+          'your-code-which-calls-helpers))
+#+END_SRC
+
+When uploading a file, the server expects to find a function called
+solver in the namespace provided.
+#+BEGIN_SRC clojure
+  (ns team-42)
+  
+  (defn solver [n-view e-view s-view w-view path]
+    'your-code)
+#+END_SRC
 *** Running manually
 To run the code first clone the project.
 #+BEGIN_EXAMPLE
