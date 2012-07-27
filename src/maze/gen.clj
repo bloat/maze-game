@@ -8,8 +8,8 @@
   (when (seq cands)
     (rand-nth cands)))
 
-(defn find-neighbour-not-in-c [cell c complete]
-  (choose-neighbour-from-candidates (remove (into c complete) (neighbours cell))))
+(defn find-neighbour-not-in-c [size cell c complete]
+  (choose-neighbour-from-candidates (remove (into c complete) (neighbours size cell))))
 
 (defn make-path [grid cell-a cell-b]
   (conj grid [cell-a cell-b]))
@@ -26,15 +26,17 @@ between those two cells.  c is a set of cells currently under
 consideration. To start with it contains one random cell.  complete is
 a vector of cells which are completely specified."
   ([]
-     (maze-gen #{} #{(rand-int 100)} []))
-  ([paths c complete]
+     (maze-gen (+ 10 (rand-int 11))))
+  ([size]
+     (maze-gen size #{} #{(rand-int (* size size))} []))
+  ([size paths c complete]
      (if (empty? c)
-       paths
+       [size paths]
        (let [cell-from-c (choose-from-c c)
-             neighbour (find-neighbour-not-in-c cell-from-c c complete)]
+             neighbour (find-neighbour-not-in-c size cell-from-c c complete)]
          (if neighbour
-           (recur (make-path paths cell-from-c neighbour) (conj c neighbour) complete)
-           (recur paths (disj c cell-from-c) (conj complete cell-from-c)))))))
+           (recur size (make-path paths cell-from-c neighbour) (conj c neighbour) complete)
+           (recur size paths (disj c cell-from-c) (conj complete cell-from-c)))))))
 
 ;; This file is part of Amazing Dojo.
 

@@ -6,48 +6,49 @@
                  :s s-path?
                  :w w-path?})
 
-(defn inc-if-can-go [cell grid dir to-inc]
-  (if ((path-preds dir) grid cell)
+(defn inc-if-can-go [cell maze dir to-inc]
+  (if ((path-preds dir) maze cell)
     (inc to-inc)
     to-inc))
 
-(defn view [pos grid dir]
+(defn view [pos maze dir]
   (loop [length 0 r-paths 0 l-paths 0 cell pos]
-    (let [new-r-paths (inc-if-can-go cell grid (right-dir dir) r-paths)
-          new-l-paths (inc-if-can-go cell grid (left-dir dir) l-paths)]
-      (if ((path-preds dir) grid cell)
+    (let [new-r-paths (inc-if-can-go cell maze (right-dir dir) r-paths)
+          new-l-paths (inc-if-can-go cell maze (left-dir dir) l-paths)]
+      (if ((path-preds dir) maze cell)
         (recur (inc length)
                new-r-paths
                new-l-paths
-               ((mv-fns dir) cell))
+               ((mv-fns dir) (first maze) cell))
         [length new-r-paths new-l-paths]))))
 
-(defn n-view [pos grid] (view pos grid :n))
-(defn e-view [pos grid] (view pos grid :e))
-(defn s-view [pos grid] (view pos grid :s))
-(defn w-view [pos grid] (view pos grid :w))
+(defn n-view [pos maze] (view pos maze :n))
+(defn e-view [pos maze] (view pos maze :e))
+(defn s-view [pos maze] (view pos maze :s))
+(defn w-view [pos maze] (view pos maze :w))
 
-(defn apply-move [cell move grid]
-  (if ((path-preds move) grid cell)
-    ((mv-fns move) cell)
+(defn apply-move [cell move maze]
+  (if ((path-preds move) maze cell)
+    ((mv-fns move) (first maze) cell)
     cell))
 
-(defn play-maze [grid maze-fn start tries path]
-  (cond
-    (zero? tries) [:failure path]
-    (= 99 start) [:success path]
-    :else (let [move (maze-fn (n-view start grid)
-                              (e-view start grid)
-                              (s-view start grid)
-                              (w-view start grid)
-                              path)
-                new-cell (apply-move start move grid)
-                new-path (if (= start new-cell) path (conj path move))]
-            (recur grid
-                   maze-fn
-                   new-cell
-                   (dec tries)
-                   new-path))))
+(defn play-maze [maze maze-fn start tries path]
+  (let [target (dec (* (first maze) (first maze)))]
+    (cond
+      (zero? tries) [:failure path]
+      (= target start) [:success path]
+      :else (let [move (maze-fn (n-view start maze)
+                                (e-view start maze)
+                                (s-view start maze)
+                                (w-view start maze)
+                                path)
+                  new-cell (apply-move start move maze)
+                  new-path (if (= start new-cell) path (conj path move))]
+              (recur maze
+                     maze-fn
+                     new-cell
+                     (dec tries)
+                     new-path)))))
 
 (defn ex-play
   [n-view e-view s-view w-view path]

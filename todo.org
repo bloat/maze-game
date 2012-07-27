@@ -1,7 +1,7 @@
 * DONE readme file - write instruction
 * DONE css
 * TODO submission detail page
-* TODO Make the size of the maze a parameter
+* DONE Make the size of the maze a parameter
 * DONE Provide side passage counts to function
 * DONE prevent overwriting of functions with the same name.
 * DONE Add percentages to the scores / sort by percentage.

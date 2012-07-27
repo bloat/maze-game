@@ -30,8 +30,10 @@ are.
 The path argument is a list of all the moves the player has made so far.
 
 The function does not get told its absolute position within the maze,
-but know that you begin at position 0 (north-west) and succeed when
-you reach position 99 (south-east).
+nor the size of the maze, but know the maze is a square of between 10
+and 20 units on each side. You begin at position 0 (north-west)
+and succeed you reach the south-east corner, e.g. position 99 in a
+10x10 maze.
 
 Each turn, the function must return a keyword, one of :n, :e, :s or :w.
 
