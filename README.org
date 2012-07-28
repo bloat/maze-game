@@ -50,9 +50,9 @@ When pasting code directly, the server expects a single form that
 evaluates to a function. This means that any helper functions must be
 defined in a letfn form that returns the main function. For example:
 #+BEGIN_SRC clojure
-  (letfn [(helper-fn [arg] 'helper-code) (another-helper [arg]
-          'more-code)] (fn [n-view e-view s-view w-view path]
-          'your-code-which-calls-helpers))
+  (letfn [(helper-fn [arg] 'helper-code)
+          (another-helper [arg] 'more-code)]
+    (fn [n-view e-view s-view w-view path] 'your-code-which-calls-helpers))
 #+END_SRC
 
 When uploading a file, the server expects to find a function called
@@ -115,7 +115,7 @@ game is started. To do this you can visit
 #+BEGIN_EXAMPLE
 http://<yourhost>/control
 #+END_EXAMPLE
-You can also start at stop the game from the repl.
+You can also start and stop the game from the repl.
 #+BEGIN_SRC clojure
   (in-ns 'maze.controller)
   (start)
