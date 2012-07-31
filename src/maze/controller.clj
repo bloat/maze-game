@@ -4,13 +4,18 @@
 
 (def solvers (atom {}))
 
+(defn process-results [[[status1 path1] [status2 path2]]]
+  (cond
+    (= status1 status2 :failure) 0
+    (and (= status1 :success) (= status2 :failure)) -1
+    (and (= status1 :failure) (= status2 :success)) 1
+    (= (count path1) (count path2)) 0
+    (< (count path1) (count path2)) -1
+    :else 1))
+
 (defn battle [s1 s2]
-  (let [maze (maze-gen)
-        [_ path1] (play-maze maze s1 0 5000 [])
-        [_ path2] (play-maze maze s2 0 5000 [])]
-    (cond (= (count path1) (count path2)) 0
-          (< (count path1) (count path2)) -1
-          :else 1)))
+  (let [maze (maze-gen)]
+    [(play-maze maze s1 0 5000 []) (play-maze maze s2 0 5000 [])]))
 
 (defn get-solver-fn [solvers-val name]
   (:fn (solvers-val name)))
@@ -80,7 +85,7 @@
       (let [[n1 {p1 :fn s1 :score}] (pick-player players)
             [n2 {p2 :fn s2 :score}] (pick-player players)]
         (when (not (= n1 n2))
-          (let [result (battle p1 p2)]
+          (let [result (process-results (battle p1 p2))]
             (condp = result
               0 (dosync
                  (commute s1 inc-draw)
